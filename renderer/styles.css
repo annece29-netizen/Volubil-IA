@@ -1,0 +1,283 @@
+/* Style de la fenetre principale, inspire de Wispr Flow : fond creme, encre
+   foncee, accent chaud, titres en serif, interface aeree, theme clair unique. */
+
+:root {
+  --creme: #faf7f2;
+  --encre: #1f1d1a;
+  --accent: #c96f4a;
+  --accent-clair: #e8b9a2;
+  --gris-doux: #7a746a;
+  --bordure: #e6ddd0;
+  --carte: #ffffff;
+  --vert: #4a8f5c;
+  --orange: #c98b2e;
+  --rouge: #b6473f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+  background: var(--creme);
+  color: var(--encre);
+  height: 100vh;
+  overflow: hidden;
+}
+
+h1, h2, h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: normal;
+  margin: 0 0 0.5em 0;
+}
+
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+.barre-laterale {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--carte);
+  border-right: 1px solid var(--bordure);
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.barre-laterale .logo {
+  font-family: Georgia, serif;
+  font-size: 1.3em;
+  padding: 0 12px 20px 12px;
+  color: var(--accent);
+}
+
+.barre-laterale button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--encre);
+  border-radius: 8px;
+  font-size: 0.95em;
+  cursor: pointer;
+}
+
+.barre-laterale button:hover {
+  background: var(--creme);
+}
+
+.barre-laterale button.actif {
+  background: var(--accent);
+  color: white;
+}
+
+.contenu {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px 40px;
+}
+
+.page {
+  display: none;
+}
+
+.page.visible {
+  display: block;
+}
+
+.cartes-stats {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0 32px 0;
+}
+
+.carte-stat {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 12px;
+  padding: 18px 22px;
+  flex: 1;
+}
+
+.carte-stat .valeur {
+  font-size: 1.8em;
+  font-family: Georgia, serif;
+  color: var(--accent);
+}
+
+.carte-stat .libelle {
+  color: var(--gris-doux);
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+.groupe-jour {
+  margin-bottom: 24px;
+}
+
+.groupe-jour h3 {
+  color: var(--gris-doux);
+  font-size: 0.95em;
+  border-bottom: 1px solid var(--bordure);
+  padding-bottom: 6px;
+}
+
+.entree-historique {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.entree-historique .texte {
+  flex: 1;
+}
+
+.entree-historique .heure {
+  color: var(--gris-doux);
+  font-size: 0.8em;
+  margin-bottom: 4px;
+}
+
+.entree-historique .actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.entree-historique .actions button {
+  border: 1px solid var(--bordure);
+  background: white;
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+button.principal {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 0.95em;
+}
+
+button.principal:hover {
+  opacity: 0.92;
+}
+
+button.discret {
+  background: transparent;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.champ {
+  margin-bottom: 18px;
+}
+
+.champ label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  color: var(--gris-doux);
+}
+
+.champ input[type="text"],
+.champ select,
+.champ textarea {
+  width: 100%;
+  max-width: 420px;
+  padding: 9px 12px;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 0.95em;
+  background: white;
+  color: var(--encre);
+}
+
+.champ textarea {
+  max-width: 100%;
+  font-family: inherit;
+}
+
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85em;
+}
+
+.pastille.verte {
+  background: #e6f4e9;
+  color: var(--vert);
+}
+
+.pastille.orange {
+  background: #fbead2;
+  color: var(--orange);
+}
+
+.pastille.rouge {
+  background: #f7e2e0;
+  color: var(--rouge);
+}
+
+.ligne-dictionnaire {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.ligne-dictionnaire .variantes {
+  color: var(--gris-doux);
+  font-size: 0.85em;
+}
+
+.barre-progression {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bordure);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.barre-progression .remplissage {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.a-propos p {
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.vide {
+  color: var(--gris-doux);
+  font-style: italic;
+  padding: 24px 0;
+}

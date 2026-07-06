@@ -1,0 +1,87 @@
+/* HUD : petite fenetre frameless et transparente, non focusable, toujours au
+   premier plan, en bas de l'ecran. */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+.hud {
+  background: rgba(31, 29, 26, 0.92);
+  color: #faf7f2;
+  border-radius: 14px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+
+.ligne-principale {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9em;
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #b6473f;
+  flex-shrink: 0;
+}
+
+.point.pulse {
+  animation: pulser 1s infinite ease-in-out;
+}
+
+@keyframes pulser {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.message {
+  flex: 1;
+}
+
+.chrono {
+  color: #c9c2b4;
+  font-variant-numeric: tabular-nums;
+}
+
+.vumetre {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+  display: none;
+}
+
+.vumetre.visible {
+  display: block;
+}
+
+.barre {
+  height: 100%;
+  width: 0%;
+  background: #c96f4a;
+  transition: width 0.08s linear;
+}
+
+.bouton-corriger {
+  align-self: flex-end;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #faf7f2;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8em;
+  cursor: pointer;
+}

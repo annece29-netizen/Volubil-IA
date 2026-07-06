@@ -1,0 +1,99 @@
+# Fabrique automatiquement les installateurs Windows (.exe) et Mac (.dmg)
+# a chaque fois qu'une etiquette de version (v1.0.0, v1.1.0...) est poussee,
+# puis les attache a la page "Releases" du depot.
+# Compile aussi whisper.cpp pour chaque plateforme avant d'empaqueter l'app.
+name: Construire les installateurs
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+env:
+  WHISPER_TAG: v1.8.7
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache du build whisper.cpp
+        id: cache-whisper
+        uses: actions/cache@v4
+        with:
+          path: whisper.cpp
+          key: whisper-${{ matrix.os }}-${{ env.WHISPER_TAG }}
+
+      - name: Cloner whisper.cpp
+        if: steps.cache-whisper.outputs.cache-hit != 'true'
+        run: git clone --depth 1 --branch ${{ env.WHISPER_TAG }} https://github.com/ggml-org/whisper.cpp
+
+      - name: Configurer whisper.cpp (Windows)
+        if: matrix.os == 'windows-latest' && steps.cache-whisper.outputs.cache-hit != 'true'
+        run: cmake -S whisper.cpp -B whisper.cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_SERVER=OFF -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
+
+      - name: Configurer whisper.cpp (macOS)
+        if: matrix.os == 'macos-latest' && steps.cache-whisper.outputs.cache-hit != 'true'
+        run: cmake -S whisper.cpp -B whisper.cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_SERVER=OFF -DGGML_METAL_EMBED_LIBRARY=ON
+
+      - name: Compiler whisper.cpp
+        if: steps.cache-whisper.outputs.cache-hit != 'true'
+        run: cmake --build whisper.cpp/build --config Release -j
+
+      - name: Copier le binaire whisper-cli (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          mkdir -p vendor/win
+          if [ -f "whisper.cpp/build/bin/Release/whisper-cli.exe" ]; then
+            cp whisper.cpp/build/bin/Release/whisper-cli.exe vendor/win/whisper-cli.exe
+          else
+            cp whisper.cpp/build/bin/whisper-cli.exe vendor/win/whisper-cli.exe
+          fi
+
+      - name: Copier le binaire whisper-cli (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p vendor/mac
+          cp whisper.cpp/build/bin/whisper-cli vendor/mac/whisper-cli
+          chmod +x vendor/mac/whisper-cli
+
+      - name: Installer les dependances
+        run: npm ci
+
+      - name: Generer les icones
+        run: npm run icons
+
+      - name: Verifier la syntaxe de tous les fichiers
+        run: npm run check
+
+      - name: Construire l'installateur
+        run: npx electron-builder --publish never
+
+      - name: Publier sur la page Releases
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Volubil-IA ${{ github.ref_name }}
+          body: |
+            Télécharge le fichier qui correspond à ton ordinateur, juste en dessous (section "Assets") :
+            - Windows : le fichier `.exe`
+            - Mac (Apple Silicon) : le fichier `.dmg`
+
+            Mode d'emploi complet dans le [README](https://github.com/annece29-netizen/Volubil-IA#readme).
+          files: |
+            dist/*.exe
+            dist/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

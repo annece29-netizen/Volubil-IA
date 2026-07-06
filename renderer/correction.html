@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Corriger la dictée</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { overflow-y: auto; }
+    .correction { padding: 28px 32px; }
+    #zone-suggestions { margin-top: 20px; }
+    .suggestion {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--bordure);
+    }
+    .suggestion .mots { flex: 1; }
+    .message-confirmation {
+      margin-top: 14px;
+      color: var(--vert);
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="correction">
+    <h1>Corriger la dictée</h1>
+    <div class="champ">
+      <label for="texte-correction">Texte inséré</label>
+      <textarea id="texte-correction" rows="6"></textarea>
+    </div>
+    <button class="principal" id="btn-enregistrer-correction">Enregistrer</button>
+
+    <div id="zone-suggestions"></div>
+
+    <div class="message-confirmation" id="message-confirmation" style="display: none;"></div>
+  </div>
+
+  <script src="correction.js"></script>
+</body>
+</html>

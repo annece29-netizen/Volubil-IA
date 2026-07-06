@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Bienvenue dans Volubil-IA</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body { overflow-y: auto; }
+    .onboarding { max-width: 640px; margin: 0 auto; padding: 36px 40px; }
+    .etape { display: none; }
+    .etape.visible { display: block; }
+    .cartes-mode { display: flex; gap: 16px; margin: 20px 0; }
+    .carte-mode {
+      flex: 1;
+      border: 2px solid var(--bordure);
+      border-radius: 12px;
+      padding: 18px;
+      cursor: pointer;
+    }
+    .carte-mode.selectionnee { border-color: var(--accent); background: #fdf1ea; }
+    .carte-mode h3 { margin-bottom: 8px; }
+    .carte-mode p { color: var(--gris-doux); font-size: 0.9em; margin: 0; }
+    .navigation { display: flex; justify-content: space-between; margin-top: 28px; }
+    .rappel-raccourci {
+      background: var(--carte);
+      border: 1px solid var(--bordure);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 1.1em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="onboarding">
+    <!-- Etape 1 : bienvenue -->
+    <div class="etape visible" id="etape-1">
+      <h1>Bienvenue dans Volubil-IA</h1>
+      <p>
+        Volubil-IA transforme ta voix en texte, directement dans l'application
+        que tu utilises, sans jamais rien envoyer sur internet (sauf le
+        téléchargement du modèle, une seule fois). Ton micro, ta machine,
+        rien d'autre.
+      </p>
+      <div class="navigation">
+        <span></span>
+        <button class="principal" data-suivant>Continuer</button>
+      </div>
+    </div>
+
+    <!-- Etape 2 : choix du mode -->
+    <div class="etape" id="etape-2">
+      <h2>Choisis ton mode de nettoyage</h2>
+      <div class="cartes-mode">
+        <div class="carte-mode selectionnee" data-mode="simple">
+          <h3>Simple</h3>
+          <p>Léger, fonctionne sur n'importe quelle machine. Filtrage des hésitations par règles.</p>
+        </div>
+        <div class="carte-mode" data-mode="ameliore">
+          <h3>Amélioré</h3>
+          <p>Nécessite Ollama et 8 Go de RAM ou plus. Ponctuation automatique, corrections intelligentes.</p>
+        </div>
+      </div>
+      <div id="verification-ollama" style="display: none;"></div>
+      <div class="navigation">
+        <button class="discret" data-precedent>Retour</button>
+        <button class="principal" data-suivant>Continuer</button>
+      </div>
+    </div>
+
+    <!-- Etape 3 : choix du modele Whisper -->
+    <div class="etape" id="etape-3">
+      <h2>Choisis la taille du modèle de transcription</h2>
+      <div class="cartes-mode">
+        <div class="carte-mode selectionnee" data-taille="base">
+          <h3>Base</h3>
+          <p>Recommandé, rapide. Environ 142 Mo.</p>
+        </div>
+        <div class="carte-mode" data-taille="small">
+          <h3>Small</h3>
+          <p>Plus précis, plus lourd. Environ 466 Mo.</p>
+        </div>
+      </div>
+      <button class="principal" id="btn-telecharger-modele">Télécharger</button>
+      <div class="barre-progression" id="barre-modele" style="display: none;">
+        <div class="remplissage" id="remplissage-modele" style="width: 0%;"></div>
+      </div>
+      <div id="statut-modele" style="margin-top: 10px;"></div>
+      <div class="navigation">
+        <button class="discret" data-precedent>Retour</button>
+        <button class="principal" data-suivant id="btn-etape3-suivant" disabled>Continuer</button>
+      </div>
+    </div>
+
+    <!-- Etape 4 : raccourci -->
+    <div class="etape" id="etape-4">
+      <h2>Ton raccourci clavier</h2>
+      <p>Une pression démarre l'enregistrement, une autre pression l'arrête (mode bascule).</p>
+      <div class="rappel-raccourci" id="rappel-raccourci">Ctrl+Space</div>
+      <p style="color: var(--gris-doux);">
+        Tu peux le changer à tout moment dans les réglages, depuis la fenêtre
+        principale.
+      </p>
+      <div class="navigation">
+        <button class="discret" data-precedent>Retour</button>
+        <button class="principal" data-suivant>Continuer</button>
+      </div>
+    </div>
+
+    <!-- Etape 5 : termine -->
+    <div class="etape" id="etape-5">
+      <h2>C'est prêt</h2>
+      <p>Appuie sur ton raccourci, parle, appuie à nouveau : ton texte s'insère directement.</p>
+      <div class="navigation">
+        <span></span>
+        <button class="principal" id="btn-terminer">Ouvrir Volubil-IA</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="onboarding.js"></script>
+</body>
+</html>

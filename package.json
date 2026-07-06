@@ -1,0 +1,71 @@
+{
+  "name": "volubil-ia",
+  "productName": "Volubil-IA",
+  "version": "1.0.0",
+  "description": "Dictee vocale 100% locale pour Windows et macOS, inspiree de Wispr Flow",
+  "main": "main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --publish never",
+    "icons": "node tools/make-icon.js",
+    "check": "node tools/check.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Anne-Cecile Le Dain",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/annece29-netizen/Volubil-IA.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "fr.annececile.volubil-ia",
+    "productName": "Volubil-IA",
+    "files": [
+      "main/**/*",
+      "renderer/**/*",
+      "preload.js",
+      "icon.png"
+    ],
+    "win": {
+      "target": "nsis",
+      "extraResources": [
+        {
+          "from": "vendor/win",
+          "to": "bin"
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "artifactName": "Volubil-IA-Windows-${version}.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.productivity",
+      "artifactName": "Volubil-IA-Mac-${version}.${ext}",
+      "extraResources": [
+        {
+          "from": "vendor/mac",
+          "to": "bin"
+        }
+      ],
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Volubil-IA utilise le micro pour la dictee vocale, entierement en local."
+      }
+    }
+  }
+}
