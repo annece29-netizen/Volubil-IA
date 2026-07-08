@@ -131,6 +131,29 @@ function nombreThreads() {
   return Math.max(2, cpus - 2);
 }
 
+// whisper-cli (whisper.cpp) lit ses arguments de chemin via l'ancienne API
+// Windows en "code page" ANSI, pas en UTF-8 : un nom d'utilisateur accentue
+// (ex. "FrançoisHascoet") corrompt le chemin et fait planter le chargement
+// du modele des l'ouverture. On copie alors le fichier vers un chemin de
+// secours garanti ASCII (C:\Windows\Temp sur Windows) avant l'appel.
+function contientNonAscii(chemin) {
+  return /[^\x00-\x7F]/.test(chemin);
+}
+
+function cheminSansAccent(cheminOriginal, prefixe) {
+  if (!contientNonAscii(cheminOriginal)) return cheminOriginal;
+
+  const dossierSecours =
+    process.platform === 'win32'
+      ? path.join(process.env.WINDIR || 'C:\\Windows', 'Temp', 'volubil-ia-ascii')
+      : path.join(os.tmpdir(), 'volubil-ia-ascii');
+
+  fs.mkdirSync(dossierSecours, { recursive: true });
+  const cheminCopie = path.join(dossierSecours, `${prefixe}${path.extname(cheminOriginal)}`);
+  fs.copyFileSync(cheminOriginal, cheminCopie);
+  return cheminCopie;
+}
+
 // Lance whisper-cli sur un fichier WAV et retourne le texte transcrit.
 function transcrire(wavPath, { userDataPath, modelSize, language }) {
   return new Promise((resolve, reject) => {
@@ -150,9 +173,19 @@ function transcrire(wavPath, { userDataPath, modelSize, language }) {
       return;
     }
 
+    let modelPathAppel;
+    let wavPathAppel;
+    try {
+      modelPathAppel = cheminSansAccent(modelPath, 'modele');
+      wavPathAppel = cheminSansAccent(wavPath, `audio-${Date.now()}`);
+    } catch (err) {
+      reject(err);
+      return;
+    }
+
     const args = [
-      '-m', modelPath,
-      '-f', wavPath,
+      '-m', modelPathAppel,
+      '-f', wavPathAppel,
       '-l', language || 'fr',
       '-nt',
       '-t', String(nombreThreads()),
@@ -163,10 +196,16 @@ function transcrire(wavPath, { userDataPath, modelSize, language }) {
     let erreurs = '';
     let termine = false;
 
+    function nettoyerCopiesTemporaires() {
+      if (modelPathAppel !== modelPath) fs.unlink(modelPathAppel, () => {});
+      if (wavPathAppel !== wavPath) fs.unlink(wavPathAppel, () => {});
+    }
+
     const minuteur = setTimeout(() => {
       if (termine) return;
       termine = true;
       processus.kill();
+      nettoyerCopiesTemporaires();
       reject(new Error('La transcription a dépassé le délai maximal (120 s).'));
     }, TIMEOUT_TRANSCRIPTION_MS);
 
@@ -181,6 +220,7 @@ function transcrire(wavPath, { userDataPath, modelSize, language }) {
       if (termine) return;
       termine = true;
       clearTimeout(minuteur);
+      nettoyerCopiesTemporaires();
       reject(err);
     });
 
@@ -188,6 +228,7 @@ function transcrire(wavPath, { userDataPath, modelSize, language }) {
       if (termine) return;
       termine = true;
       clearTimeout(minuteur);
+      nettoyerCopiesTemporaires();
       if (code !== 0) {
         reject(new Error(`whisper-cli a échoué (code ${code}) : ${erreurs.slice(0, 500)}`));
         return;
